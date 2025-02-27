@@ -1,22 +1,22 @@
-# Artifacts
+# Artifacts（工件）
 
-Artifacts is a special user interface mode that allows you to have a workspace like interface along with the chat interface. This is similar to [ChatGPT's Canvas](https://openai.com/index/introducing-canvas) and [Claude's Artifacts](https://www.anthropic.com/news/artifacts).
+Artifacts 是一种特殊的用户界面模式，允许你在聊天界面的基础上拥有类似工作区的界面。这类似于 [ChatGPT 的 Canvas](https://openai.com/index/introducing-canvas) 和 [Claude 的 Artifacts](https://www.anthropic.com/news/artifacts)。
 
-The template already ships with the following artifacts:
+该模板已经自带了以下几种工件：
 
-- **Text Artifact**: A artifact that allows you to work with text content like drafting essays and emails.
-- **Code Artifact**: A artifact that allows you to write and execute code (Python).
-- **Image Artifact**: A artifact that allows you to work with images like editing, annotating, and processing images.
-- **Sheet Artifact**: A artifact that allows you to work with tabular data like creating, editing, and analyzing data.
+- **文本工件**：允许你处理文本内容，比如起草文章和电子邮件。
+- **代码工件**：允许你编写和执行代码（如 Python）。
+- **图像工件**：允许你处理图像，比如编辑、注释和处理图像。
+- **表格工件**：允许你处理表格数据，如创建、编辑和分析数据。
 
-## Adding a Custom Artifact
+## 添加自定义工件
 
-To add a custom artifact, you will need to create a folder in the `artifacts` directory with the artifact name. The folder should contain the following files:
+要添加自定义工件，你需要在 `artifacts` 目录下创建一个以工件名称命名的文件夹。该文件夹应包含以下文件：
 
-- `client.tsx`: The client-side code for the artifact.
-- `server.ts`: The server-side code for the artifact.
+- `client.tsx`：工件的客户端代码。
+- `server.ts`：工件的服务器端代码。
 
-Here is an example of a custom artifact called `CustomArtifact`:
+以下是一个名为 `CustomArtifact` 的自定义工件示例：
 
 ```bash
 artifacts/
@@ -25,47 +25,47 @@ artifacts/
     server.ts
 ```
 
-### Client-Side Example (client.tsx)
+### 客户端示例（client.tsx）
 
-This file is responsible for rendering your custom artifact. You might replace the inner UI with your own components, but the overall pattern (initialization, handling streamed data, and rendering content) remains the same. For instance:
+该文件负责渲染你的自定义工件。你可以用自己的组件替换内部 UI，但整体模式（初始化、处理流式数据、渲染内容）保持不变。例如：
 
 ```tsx
-import { Artifact } from "@/components/create-artifact";
-import { ExampleComponent } from "@/components/example-component";
-import { toast } from "sonner";
+import { Artifact } from "@/components/create-artifact"
+import { ExampleComponent } from "@/components/example-component"
+import { toast } from "sonner"
 
 interface CustomArtifactMetadata {
-  // Define metadata your custom artifact might need—the example below is minimal.
-  info: string;
+  // 定义自定义工件可能需要的元数据，以下示例较为简单。
+  info: string
 }
 
 export const customArtifact = new Artifact<"custom", CustomArtifactMetadata>({
   kind: "custom",
-  description: "A custom artifact for demonstrating custom functionality.",
-  // Initialization can fetch any extra data or perform side effects
+  description: "一个展示自定义功能的工件。",
+  // 初始化时可以获取额外的数据或执行副作用
   initialize: async ({ documentId, setMetadata }) => {
-    // For example, initialize the artifact with default metadata.
+    // 例如，用默认元数据初始化工件。
     setMetadata({
-      info: `Document ${documentId} initialized.`,
-    });
+      info: `文档 ${documentId} 已初始化。`,
+    })
   },
-  // Handle streamed parts from the server (if your artifact supports streaming updates)
+  // 处理从服务器流式传输的部分（如果工件支持流式更新）
   onStreamPart: ({ streamPart, setMetadata, setArtifact }) => {
     if (streamPart.type === "info-update") {
       setMetadata((metadata) => ({
         ...metadata,
         info: streamPart.content as string,
-      }));
+      }))
     }
     if (streamPart.type === "content-update") {
       setArtifact((draftArtifact) => ({
         ...draftArtifact,
         content: draftArtifact.content + (streamPart.content as string),
         status: "streaming",
-      }));
+      }))
     }
   },
-  // Defines how the artifact content is rendered
+  // 定义工件内容的渲染方式
   content: ({
     mode,
     status,
@@ -78,19 +78,19 @@ export const customArtifact = new Artifact<"custom", CustomArtifactMetadata>({
     metadata,
   }) => {
     if (isLoading) {
-      return <div>Loading custom artifact...</div>;
+      return <div>加载自定义工件...</div>
     }
 
     if (mode === "diff") {
-      const oldContent = getDocumentContentById(currentVersionIndex - 1);
-      const newContent = getDocumentContentById(currentVersionIndex);
+      const oldContent = getDocumentContentById(currentVersionIndex - 1)
+      const newContent = getDocumentContentById(currentVersionIndex)
       return (
         <div>
-          <h3>Diff View</h3>
+          <h3>差异视图</h3>
           <pre>{oldContent}</pre>
           <pre>{newContent}</pre>
         </div>
-      );
+      )
     }
 
     return (
@@ -103,84 +103,83 @@ export const customArtifact = new Artifact<"custom", CustomArtifactMetadata>({
         />
         <button
           onClick={() => {
-            navigator.clipboard.writeText(content);
-            toast.success("Content copied to clipboard!");
+            navigator.clipboard.writeText(content)
+            toast.success("内容已复制到剪贴板！")
           }}
         >
-          Copy
+          复制
         </button>
       </div>
-    );
+    )
   },
-  // An optional set of actions exposed in the artifact toolbar.
+  // 工件工具栏中可选的操作
   actions: [
     {
       icon: <span>⟳</span>,
-      description: "Refresh artifact info",
+      description: "刷新工件信息",
       onClick: ({ appendMessage }) => {
         appendMessage({
           role: "user",
-          content: "Please refresh the info for my custom artifact.",
-        });
+          content: "请刷新我的自定义工件信息。",
+        })
       },
     },
   ],
-  // Additional toolbar actions for more control
+  // 更多控制选项的工具栏操作
   toolbar: [
     {
       icon: <span>✎</span>,
-      description: "Edit custom artifact",
+      description: "编辑自定义工件",
       onClick: ({ appendMessage }) => {
         appendMessage({
           role: "user",
-          content: "Edit the custom artifact content.",
-        });
+          content: "编辑自定义工件内容。",
+        })
       },
     },
   ],
-});
+})
 ```
 
-Server-Side Example (server.ts)
+### 服务器端示例（server.ts）
 
-The server file processes the document for the artifact. It streams updates (if applicable) and returns the final content. For example:
+服务器文件处理工件的文档。它可以流式传输更新（如果适用）并返回最终内容。例如：
 
 ```ts
-import { smoothStream, streamText } from "ai";
-import { myProvider } from "@/lib/ai/models";
-import { createDocumentHandler } from "@/lib/artifacts/server";
-import { updateDocumentPrompt } from "@/lib/ai/prompts";
+import { smoothStream, streamText } from "ai"
+import { myProvider } from "@/lib/ai/models"
+import { createDocumentHandler } from "@/lib/artifacts/server"
+import { updateDocumentPrompt } from "@/lib/ai/prompts"
 
 export const customDocumentHandler = createDocumentHandler<"custom">({
   kind: "custom",
-  // Called when the document is first created.
+  // 创建文档时调用。
   onCreateDocument: async ({ title, dataStream }) => {
-    let draftContent = "";
-    // For demonstration, use streamText to generate content.
+    let draftContent = ""
+    // 例如，使用 streamText 来生成内容。
     const { fullStream } = streamText({
       model: myProvider.languageModel("artifact-model"),
-      system:
-        "Generate a creative piece based on the title. Markdown is supported.",
+      system: "根据标题生成创意内容。支持 Markdown。",
       experimental_transform: smoothStream({ chunking: "word" }),
       prompt: title,
-    });
+    })
 
-    // Stream the content back to the client.
+    // 将内容流式传输回客户端。
     for await (const delta of fullStream) {
       if (delta.type === "text-delta") {
-        draftContent += delta.textDelta;
+        draftContent += delta.textDelta
         dataStream.writeData({
           type: "content-update",
           content: delta.textDelta,
-        });
+        })
       }
     }
 
-    return draftContent;
+    return draftContent
   },
-  // Called when updating the document based on user modifications.
+  // 当根据用户修改更新文档时调用。
   onUpdateDocument: async ({ document, description, dataStream }) => {
-    let draftContent = "";
+    let draftContent = ""
     const { fullStream } = streamText({
       model: myProvider.languageModel("artifact-model"),
       system: updateDocumentPrompt(document.content, "custom"),
@@ -194,24 +193,24 @@ export const customDocumentHandler = createDocumentHandler<"custom">({
           },
         },
       },
-    });
+    })
 
     for await (const delta of fullStream) {
       if (delta.type === "text-delta") {
-        draftContent += delta.textDelta;
+        draftContent += delta.textDelta
         dataStream.writeData({
           type: "content-update",
           content: delta.textDelta,
-        });
+        })
       }
     }
 
-    return draftContent;
+    return draftContent
   },
-});
+})
 ```
 
-Once you have created the client and server files, you can import the artifact in the `lib/artifacts/server.ts` file and add it to the `documentHandlersByArtifactKind` array.
+一旦创建了客户端和服务器文件，你可以在 `lib/artifacts/server.ts` 文件中导入该工件，并将其添加到 `documentHandlersByArtifactKind` 数组中：
 
 ```ts
 export const documentHandlersByArtifactKind: Array<DocumentHandler> = [
@@ -222,7 +221,7 @@ export const documentHandlersByArtifactKind: Array<DocumentHandler> = [
 export const artifactKinds = [..., "custom"] as const;
 ```
 
-Specify it in document schema at `lib/db/schema.ts`.
+同时，在 `lib/db/schema.ts` 中的文档模式中指定它：
 
 ```ts
 export const document = pgTable(
@@ -232,7 +231,7 @@ export const document = pgTable(
     createdAt: timestamp("createdAt").notNull(),
     title: text("title").notNull(),
     content: text("content"),
-    kind: varchar("text", { enum: [..., "custom"] }) // Add the custom artifact kind here
+    kind: varchar("text", { enum: [..., "custom"] }) // 在这里添加自定义工件类型
       .notNull()
       .default("text"),
     userId: uuid("userId")
@@ -247,7 +246,7 @@ export const document = pgTable(
 );
 ```
 
-And also add the client-side artifact to the `artifactDefinitions` array in the `components/artifact.tsx` file.
+最后，将客户端工件添加到 `components/artifact.tsx` 文件中的 `artifactDefinitions` 数组中：
 
 ```ts
 import { customArtifact } from "@/artifacts/custom/client";
@@ -255,4 +254,4 @@ import { customArtifact } from "@/artifacts/custom/client";
 export const artifactDefinitions = [..., customArtifact];
 ```
 
-You should now be able to see the custom artifact in the workspace!
+现在，你应该可以在工作区中看到你的自定义工件了！
