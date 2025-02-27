@@ -15,11 +15,12 @@ export const myProvider = customProvider({
     "chat-model-large": openai("o3-mini"),
     // "chat-model-large": openai("gpt-4o"),
     "chat-model-reasoning": wrapLanguageModel({
-      model: fireworks("accounts/fireworks/models/deepseek-r1"),
+      // model: fireworks("accounts/fireworks/models/deepseek-r1"),
+      model: fireworks("accounts/fireworks/models/llama-v3p3-70b-instruct"),
       middleware: extractReasoningMiddleware({ tagName: "think" }),
     }),
-    "title-model": openai("gpt-4-turbo"),
-    "artifact-model": openai("gpt-4o-mini"),
+    "title-model": openai("gpt-3.5-turbo"),
+    "artifact-model": openai("gpt-3.5-turbo"),
   },
   imageModels: {
     "small-model": openai.image("dall-e-2"),
