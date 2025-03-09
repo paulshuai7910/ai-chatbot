@@ -23,7 +23,7 @@ export async function generateTitleFromUserMessage({
   message: Message
   model: string
 }) {
-  const { text: title } = await generateText({
+  let ad = {
     model: myProvider.languageModel(model),
     system: `\n
     - you will generate a short title based on the first message a user begins a conversation with
@@ -31,7 +31,9 @@ export async function generateTitleFromUserMessage({
     - the title should be a summary of the user's message
     - do not use quotes or colons`,
     prompt: JSON.stringify(message),
-  })
+  }
+  console.log("2----", ad)
+  const { text: title } = await generateText(ad)
 
   return title
 }

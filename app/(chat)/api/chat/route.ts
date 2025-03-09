@@ -54,15 +54,11 @@ export async function POST(request: Request) {
       message: userMessage,
       model: selectedChatModel,
     })
-    console.log("1.555555----")
     await saveChat({ id, userId: session.user.id, title })
-    console.log("1.888888----")
   }
-  console.log("2----")
   await saveMessages({
     messages: [{ ...userMessage, createdAt: new Date(), chatId: id }],
   })
-  console.log("3----")
 
   return createDataStreamResponse({
     execute: (dataStream) => {

@@ -1,5 +1,4 @@
 {
-  
   "compilerOptions": {
     "target": "ESNext",
     "lib": ["dom", "dom.iterable", "esnext"],
@@ -25,7 +24,7 @@
   },
   "rules": {
     "quotes": ["error", "single", { "avoidEscape": true }],
-    "@typescript-eslint/consistent-type-imports": "off"
+    // "@typescript-eslint/consistent-type-imports": "off"
   },
   "include": [
     "next-env.d.ts",

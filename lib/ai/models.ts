@@ -1,4 +1,5 @@
 import { openai } from "@ai-sdk/openai"
+import { deepseek } from "@ai-sdk/deepseek"
 import { fireworks } from "@ai-sdk/fireworks"
 import {
   customProvider,
@@ -12,7 +13,7 @@ export const myProvider = customProvider({
   languageModels: {
     "chat-model-small": openai("gpt-3.5-turbo"),
     // 'chat-model-small': openai('gpt-4o-mini'),
-    "chat-model-large": openai("o3-mini"),
+    "chat-model-large": deepseek("deepseek-reasoner"),
     // "chat-model-large": openai("gpt-4o"),
     "chat-model-reasoning": wrapLanguageModel({
       // model: fireworks("accounts/fireworks/models/deepseek-r1"),
